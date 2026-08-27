@@ -38,12 +38,19 @@ async def register(current_user: UserRegister,
 
     return TokenResponse(access_token=access_token, user=UserRead.model_validate(user))
 
-@app.get("/login",
+@app.post("/login",
          status_code=status.HTTP_200_OK)
 async def login(current_user: UserRegister,
                 session: AsyncSession = Depends(get_connection)):
-    user = await session.execute(select(User).where(User.email == current_user.email))
-    if not verify_password(user.hashed_password, current_user.password):
+    user = await session.execute(select(User).where(User.email == current_user.email)).scalars().first()
+    
+    if not user:
+       raise HTTPException(
+                   status_code=status.HTTP_400_BAD_REQUEST,
+                   detail="Incorrect email or password"
+               )
+     
+    if not verify_password(current_user.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password or eamil"
