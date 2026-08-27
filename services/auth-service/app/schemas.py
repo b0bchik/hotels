@@ -8,7 +8,7 @@ class CredentialsBase(BaseModel):
 class RegisterUser(CredentialsBase):
     pass
 
-class token_payload(BaseModel):
+class TokenPayload(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     email: EmailStr

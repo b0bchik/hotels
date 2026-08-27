@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import engine, get_connection
 from .models import Base, User
-from .schemas import UserRegister
+from .schemas import UserRegister,
 from .security import hash_password, verify_password, create_access_token
 
 
@@ -24,4 +24,7 @@ async def register(current_user: UserRegister,
     user = User(email=current_user.email, hash_password=hash_password(current_user.password))
     session.add(user)
     await session.commit()
-    return 
+    await session.refresh(user)
+    access_token = create_access_token(user)
+
+    return access_token

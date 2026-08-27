@@ -3,7 +3,7 @@ import jwt
 from datetime import UTC, datetime, timedelta
 
 from .models import User
-from .schemas import token_payload
+from .schemas import TokenPayload
 from .config import settings
 
 
@@ -18,7 +18,7 @@ def verify_password(password, encoded_password):
 def create_access_token(user: User):
     now = datetime.now(UTC)
     expires_in = now + timedelta(seconds=360)
-    payload = token_payload(**user, exp=expires_in, role="user").model_dump(mode="json")
+    payload = TokenPayload(email=user.email, exp=expires_in, role="user").model_dump(mode="json")
     token = jwt.encode(
         payload,
         key=settings.jwt_secret.get_secret_value(),
