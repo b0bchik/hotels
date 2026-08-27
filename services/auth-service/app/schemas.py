@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import UTC, datetime, timedelta
 
 class CredentialsBase(BaseModel):
@@ -8,6 +8,9 @@ class CredentialsBase(BaseModel):
 class RegisterUser(CredentialsBase):
     pass
 
-class token_payload(CredentialsBase):
+class token_payload(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    email: EmailStr
     exp: datetime
     role: str
