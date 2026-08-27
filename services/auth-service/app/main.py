@@ -22,7 +22,7 @@ app = FastAPI()
 async def register(current_user: UserRegister,
                    session: AsyncSession = Depends(get_connection)):
     user = await session.execute(select(User).where(User.email == current_user.email))
-    
+
     if user.scalars().first():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -34,6 +34,20 @@ async def register(current_user: UserRegister,
     session.add(user)
     await session.commit()
     await session.refresh(user)
+    access_token = create_access_token(user)
+
+    return TokenResponse(access_token=access_token, user=UserRead.model_validate(user))
+
+@app.get("/login",
+         status_code=status.HTTP_200_OK)
+async def login(current_user: UserRegister,
+                session: AsyncSession = Depends(get_connection)):
+    user = await session.execute(select(User).where(User.email == current_user.email))
+    if not verify_password(user.hashed_password, current_user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password or eamil"
+        )
     access_token = create_access_token(user)
 
     return TokenResponse(access_token=access_token, user=UserRead.model_validate(user))
