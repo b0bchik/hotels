@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-
+from datetime import UTC, datetime, timedelta
 
 class CredentialsBase(BaseModel):
     email: EmailStr
@@ -7,3 +7,7 @@ class CredentialsBase(BaseModel):
 
 class RegisterUser(CredentialsBase):
     pass
+
+class token_payload(CredentialsBase):
+    exp: datetime
+    role: str
