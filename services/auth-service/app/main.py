@@ -21,7 +21,16 @@ app = FastAPI()
           status_code=status.HTTP_201_CREATED)
 async def register(current_user: UserRegister,
                    session: AsyncSession = Depends(get_connection)):
+    user = await session.execute(select(User).where(User.email == current_user.email))
+    
+    if user.scalars().first():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this email already exists"
+        )
+
     user = User(email=current_user.email, hashed_password=hash_password(current_user.password))
+
     session.add(user)
     await session.commit()
     await session.refresh(user)
