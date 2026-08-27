@@ -14,3 +14,12 @@ class token_payload(BaseModel):
     email: EmailStr
     exp: datetime
     role: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserRead
+
+class UserRead(BaseModel):
+    id: str
+    email: str
