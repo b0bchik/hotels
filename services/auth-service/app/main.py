@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import engine, get_connection
 from .models import Base, User
-from .schemas import UserRegister,
+from .schemas import UserRegister, TokenResponse, UserRead
 from .security import hash_password, verify_password, create_access_token
 
 
@@ -17,14 +17,14 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI()
 
-@app.post("/regiser",
+@app.post("/register",
           status_code=status.HTTP_201_CREATED)
 async def register(current_user: UserRegister,
-                   session = Depends(get_connection)):
-    user = User(email=current_user.email, hash_password=hash_password(current_user.password))
+                   session: AsyncSession = Depends(get_connection)):
+    user = User(email=current_user.email, hashed_password=hash_password(current_user.password))
     session.add(user)
     await session.commit()
     await session.refresh(user)
     access_token = create_access_token(user)
 
-    return access_token
+    return TokenResponse(access_token=access_token, user=UserRead.model_validate(user))
