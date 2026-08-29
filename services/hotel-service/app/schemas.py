@@ -1,18 +1,12 @@
 from pydantic import BaseModel, ConfigDict
-from decimal import Decimal
-
-
-class HotelRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: str
-    name: str
-    city: str
-    address: str
+class HotelCreate(BaseModel):
+    title: str
     description: str
     rating: float
 
-class HotelCreate(HotelRead):
-    pass
+class HotelRead(HotelCreate):
+    id: str
+    model_config = ConfigDict(from_attributes=True)
 
 class HotelUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -22,18 +16,16 @@ class HotelUpdate(BaseModel):
     description: str | None = None
     rating: float | None = None
 
-class RoomBase(BaseModel):
-    capacity: int
-    base_price: Decimal
+class RoomCreate(BaseModel):
+    title: str
+    description: str
+    price: float
 
-class RoomCreate(RoomBase):
-    pass
+class RoomRead(RoomCreate):
+    id: str
+    hotel_id: str
+    model_config = ConfigDict(from_attributes=True)
 
 class RoomUpdate(BaseModel):
     capacity: int | None = None
     base_price: Decimal | None = None
-
-class RoomRead(RoomBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    hotel_id: int

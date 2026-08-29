@@ -2,13 +2,12 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import UTC, datetime, timedelta
 
 
-class CredentialsBase(BaseModel):
+class Credentials(BaseModel):
     email: EmailStr
     password: str
 
-class UserRegister(CredentialsBase):
-    pass
-
+class UserRegister(Credentials):
+    role: str = "guest"
 class TokenPayload(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -21,6 +20,7 @@ class UserRead(BaseModel):
 
     id: str
     email: str
+    role: str
 
 class TokenResponse(BaseModel):
     access_token: str
