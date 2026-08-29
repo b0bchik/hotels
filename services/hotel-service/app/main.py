@@ -25,3 +25,19 @@ async def create_hotel(hotel: HotelCreateSchema,
     connection.add(new_hotel)
     await connection.commit()
     return new_hotel
+
+@app.get("hotels/{id}")
+async def get_hotel():
+    ...
+
+@app.patch("hotels/{id}")
+async def update_hotel():
+    ...
+
+@app.post("/hotels/{id}/rooms")
+async def create_room():
+    ...
+
+@app.get("/hotels/{id}/rooms")
+async def get_rooms():
+    ...
