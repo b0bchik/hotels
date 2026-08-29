@@ -1,4 +1,6 @@
 from pydantic import BaseModel, ConfigDict
+from decimal import Decimal
+
 class HotelCreate(BaseModel):
     title: str
     description: str
