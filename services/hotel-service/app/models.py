@@ -1,6 +1,6 @@
 from uuid import uuid4
-
-from sqlalchemy import ForeignKey, String
+from decimal import Decimal
+from sqlalchemy import ForeignKey, String, Numeric
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -24,10 +24,9 @@ class Hotel(Base):
 class Room(Base):
     __tablename__ = "rooms"
     hotel_id: Mapped[str] = mapped_column(ForeignKey("hotels.id"), nullable=False)
-    type: Mapped[str]
     capacity: Mapped[int]
-    base_price: Mapped[float]
-    amenities: Mapped[list[str]]
+    base_price: Mapped[Decimal] = mapped_column(Numeric(10,2))
+
 
   
 

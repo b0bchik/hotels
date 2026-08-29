@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import engine, get_connection
 from .models import Base, Hotel, Room
-from .schemas import HotelRead, HotelCreate
+from .schemas import HotelRead, HotelCreate, HotelUpdate, RoomRead, RoomCreate, RoomUpdate
 
 
 
@@ -37,13 +37,32 @@ async def get_hotel(hotel_id: str,
     return hotel
     
 
-@app.patch("/hotels/{id}")
-async def update_hotel():
-    ...
+@app.patch("/hotels/{hotel_id}", response_model=HotelRead, status_code=status.HTTP_200_OK)
+async def update_hotel(hotel_id: str,
+                       hotel_update: HotelUpdate,
+                       connection: AsyncSession = Depends(get_connection)):
+    hotel = await connection.get(Hotel, hotel_id)
 
-@app.post("/hotels/{id}/rooms")
-async def create_room():
-    ...
+    if hotel is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Hotel with {hotel_id} is not found")
+    update_data = hotel_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(hotel, field, value)
+    await connection.commit()
+    await connection.refresh(hotel)
+    return hotel
+
+@app.post("/hotels/{hotel_id}/rooms", response_model=RoomRead, status_code=status.HTTP_201_CREATED)
+async def create_room(hotel_id: str,
+                      room: RoomCreate,
+                      connection: AsyncSession = Depends(get_connection)):
+    hotel = await connection.get(Hotel, hotel_id)
+    if hotel is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Hotel with {hotel_id} is not found")
+    new_room = Room(**room.model_dump(), hotel_id=hotel_id)
+    return new_room
 
 @app.get("/hotels/{id}/rooms")
 async def get_rooms():
