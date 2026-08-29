@@ -15,7 +15,7 @@ async def lifespan(_: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     yield
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 @app.post("/register",
           status_code=status.HTTP_201_CREATED)
